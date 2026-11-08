@@ -1,4 +1,4 @@
-export const WORDS = ["salam", "uzmek", "bos","aferin","uzr istemek"];
+export const WORDS = ["salam", "bos","aferin","heyecan","beyin", "uzr istemek","bakı","ana"];
 
 const STEPS = 12;                 // hər hərəkəti 12 "ana kadra" sıxırıq
 const HAND_VALUES = 21 * 3;       // bir əlin forması = 63 rəqəm
@@ -151,24 +151,47 @@ export async function loadRecordings() {
   const result = [];
 
   for (const word of WORDS) {
-    const response = await fetch(`/datasets/${word}_recordings.json`);
+    const url = `/datasets/${word}_recordings.json`;
 
-    if (!response.ok) {
-      throw new Error(`${word}_recordings.json tapılmadı`);
-    }
+    try {
+      const response = await fetch(url);
 
-    const data = await response.json();
-    console.log(word, "nümunə sayı:", data.recordings.length);
-
-    data.recordings.forEach((rec, index) => {
-      const features = sequenceToFeatures(rec.frames);
-
-      if (features) {
-        result.push({ label: word, index, features });
-      } else {
-        console.warn(`${word} #${index + 1}: kifayət qədər əl kadrı yoxdur`);
+      if (!response.ok) {
+        throw new Error(
+          `${url} tapılmadı. Status: ${response.status}`
+        );
       }
-    });
+
+      const text = await response.text();
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(
+          `${url} JSON deyil. Server HTML qaytarır.`
+        );
+      }
+
+      if (!data.recordings || !Array.isArray(data.recordings)) {
+        throw new Error(`${url} daxilində recordings array yoxdur.`);
+      }
+
+      console.log(word, "nümunə sayı:", data.recordings.length);
+
+      data.recordings.forEach((rec, index) => {
+        const features = sequenceToFeatures(rec.frames);
+
+        if (features) {
+          result.push({ label: word, index, features });
+        }
+      });
+
+    } catch (error) {
+      console.error("Dataset yükləmə xətası:", error);
+      throw error;
+    }
   }
 
   return result;
