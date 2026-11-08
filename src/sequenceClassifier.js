@@ -1,4 +1,4 @@
-export const WORDS = ["salam", "bos","aferin","heyecan","beyin","bakı","ana","qarabag"];
+export const WORDS = ["salam", "bos","aferin","heyecan","beyin","bakı","ana","qarabag","uzr istemek"];
 
 const STEPS = 12;                 // hər hərəkəti 12 "ana kadra" sıxırıq
 const HAND_VALUES = 21 * 3;       // bir əlin forması = 63 rəqəm
